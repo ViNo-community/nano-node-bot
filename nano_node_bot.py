@@ -20,6 +20,7 @@ class NanoNodeBot(commands.Bot):
     online = True
     discord_token = ""
     rpc_url = ""
+    server_name = ""
     client_id = ""
     cmd_prefix = ""
     permission = 0
@@ -30,9 +31,10 @@ class NanoNodeBot(commands.Bot):
         load_dotenv()
         self.discord_token= os.getenv('discord_token')
         self.rpc_url = os.getenv('api_url')
+        self.server_name = os.getenv('server')
         self.client_id = os.getenv('client_id')
         self.cmd_prefix = os.getenv('command_prefix', "!")
-        self.permission = int(os.getenv('permission', 247872))
+        self.permission = int(os.getenv('permission')) or 247872
         self.timeout = float(os.getenv('timeout', 5.0))
         # Init set command prefix and description
         commands.Bot.__init__(self, command_prefix=self.cmd_prefix,description="Nano Node Bot")
@@ -110,11 +112,8 @@ class NanoNodeBot(commands.Bot):
             await self.update_status()
 
     async def update_status(self):
-            online = await self.get_online()
-            if(online):
-                status = f"Online, say {self.command_prefix}help"
-            else:
-                status = f"Offline, say {self.command_prefix}help"
+            online = 'Online' if await self.get_online() else 'Offline'
+            status = f" say {self.command_prefix}help | {online}"
             # Update bot status
             await self.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=status))
 
