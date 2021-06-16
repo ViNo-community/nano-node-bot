@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from common import Common
 from common import ERROR_MESSAGE
+import json 
 
 class AccountsCog(commands.Cog, name="Accounts"):
 
@@ -66,7 +67,19 @@ class AccountsCog(commands.Cog, name="Accounts"):
             await ctx.send(response)
         except Exception as e:
             Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)       
+            await ctx.send(ERROR_MESSAGE)      
+    
+    @commands.command(name='delegators', aliases=['show_delegators'], help="Displays the delegators of the node")
+    async def delegators(self,ctx):
+        try:
+            value = await self.bot.get_delegators()
+            Common.logger.info(f" Representative {str(value)}")
+            response = str(value)
+
+            await ctx.send(response[:1500])
+        except Exception as e:
+            Common.logger.error("Exception occured processing request", exc_info=True)
+            await ctx.send(ERROR_MESSAGE)   
 
 # Plug-in function to add cog
 def setup(bot):

@@ -29,8 +29,9 @@ class NanoNodeBot(commands.Bot):
         # Load discord token from .env file
         load_dotenv()
         self.discord_token= os.getenv('discord_token')
-        self.rpc_url = os.getenv('api_url')
+        self.rpc_url = os.getenv('rpc_url')
         self.client_id = os.getenv('client_id')
+        self.delegators_url = os.getenv('delegators_url')
         self.cmd_prefix = os.getenv('command_prefix', "!")
         self.permission = int(os.getenv('permission', 247872))
         self.timeout = float(os.getenv('timeout', 5.0))
@@ -96,6 +97,35 @@ class NanoNodeBot(commands.Bot):
             raise ex
         return answer
     
+    async def get_delegators(self):
+        answer = ""
+        try:
+            # Grab response from API_URL
+            r = requests.get(self.get_delegators_url(), timeout=self.timeout)
+            if r.status_code == 200:
+                # Parse JSON
+                content = json.loads(r.text)
+
+                for item in content:
+                    answer = content[item]
+  
+                for item in answer:
+                    answer[item] = (float(answer[item]) / 1000000000000000000000000000000.0)
+
+                # Log answer 
+                Common.logger.info(f"<- {answer}")
+                # Update to online
+                online = await self.get_online()
+                if(online== False):
+                    await self.set_online(True)
+            else:
+                # Update the status to
+                await self.set_online(False)
+                raise Exception("Could not connect to API")
+        except Exception as ex:
+            raise ex
+        return answer
+
     # Get online status of node
     async def get_online(self):
         return self.online
@@ -120,6 +150,9 @@ class NanoNodeBot(commands.Bot):
 
     def get_api_url(self):
         return self.rpc_url
+    
+    def get_delegators_url(self):
+        return self.delegators_url
 
     def get_client_id(self):
         return self.client_id
