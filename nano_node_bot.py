@@ -17,25 +17,37 @@ from common import Common
 
 class NanoNodeBot(commands.Bot):
 
+    # Default values
     online = True
     discord_token = ""
     rpc_url = ""
-    server_name = ""
+    server_name = "patrola.me"
     client_id = ""
-    cmd_prefix = ""
-    permission = 0
-    timeout = 0
+    cmd_prefix = "!"
+    timeout = 5.0
 
     def __init__(self):
         # Load discord token from .env file
         load_dotenv()
+        # Check required variables
+        if os.getenv('discord_token') is None:
+            raise ValueError("DISCORD_TOKEN not found. Could not start bot.")
+        if os.getenv('client_id') is None:
+            raise ValueError("CLIENT_ID not found. Could not start bot.")
+        if os.getenv('rpc_url') is None:
+             raise ValueError("RPC_URL not found. Could not start bot.")
+        # Grab tokens
         self.discord_token= os.getenv('discord_token')
-        self.rpc_url = os.getenv('api_url')
-        self.server_name = os.getenv('server')
+        self.rpc_url = os.getenv('rpc_url')
+        # self.server_name = os.getenv('server')
         self.client_id = os.getenv('client_id')
-        self.cmd_prefix = os.getenv('command_prefix', "!")
-        self.permission = int(os.getenv('permission')) or 247872
-        self.timeout = float(os.getenv('timeout', 5.0))
+        if os.getenv('command_prefix') is not None:
+            self.cmd_prefix = os.getenv('command_prefix')
+        if os.getenv('timeout') is not None:
+            try:
+                self.timeout = float(os.getenv('timeout') or 5.0)
+            except ValueError:
+                self.timeout = 5.0
         # Init set command prefix and description
         commands.Bot.__init__(self, command_prefix=self.cmd_prefix,description="Nano Node Bot")
         # Add plug-ins
@@ -130,6 +142,13 @@ class NanoNodeBot(commands.Bot):
         return self.discord_token
 
 if __name__=='__main__':
+    
     # Initiate Discord bot
-    bot = NanoNodeBot()
+    try:
+        bot = NanoNodeBot()
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        exit(0)
+
+    # Run the bot loop
     bot.run()
