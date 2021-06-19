@@ -55,17 +55,6 @@ class BotCog(commands.Cog, name="Bot"):
             Common.logger.error("Exception occured processing request", exc_info=True)
             await ctx.send(ERROR_MESSAGE)  
 
-    # THIS TEMPORARY COMMAND IS ONLY FOR DEBUGGING. WILL BE REMOVED
-    @commands.command(name='toggle_online', aliases=['toggle'], help="Toggle online status on/off [ONLY FOR DEBUG WILL BE REMOVED!!]")
-    async def toggle_online(self,ctx):
-        try:
-            # Toggle online status.
-            # Test method for now
-            await self.bot.set_online(not await self.bot.get_online())
-        except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
-
 # Plug-in function to add cog
 def setup(bot):
     bot.add_cog(BotCog(bot))

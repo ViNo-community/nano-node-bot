@@ -106,8 +106,6 @@ class NanoNodeBot(commands.Bot):
         # Log successful connection
         Common.log(f"{self.user.name} connected")
         print(f"{self.user.name} connected")
-        node_name = await self.get_value('nanoNodeName')
-        status = f"Online"
         await self.set_online(True)
 
     # This is called when the bot sees an unknown command
