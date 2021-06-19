@@ -22,6 +22,7 @@ import time
 class NanoNodeBot(commands.Bot):
 
     # Default values
+    initialized = False
     online = True
     discord_token = ""
     rpc_url = ""
@@ -59,15 +60,19 @@ class NanoNodeBot(commands.Bot):
         # Register heartbeat checker
         async def _heartbeat_loop():
             while(True):
+                online = False
                 try:
                     # Ping to check if online
                     online = await self.check_online_status()
-                    print(f"CHECKING IF ONLINE: {online}")
-                   # await self.set_online(online)
                 except Exception as error:
+                    online = False
+                    # Error. Output to chat?
+                    Common.log_error("Error checking online status of node: {error}")
                     print(error)
-                    #await self.set_online(False)
-                # Sleep XXX seconds
+                print(f"CHECKING IF ONLINE: {online} INIT: {self.initialized}")
+                if(self.initialized):
+                    await self.set_online(online)
+                # Sleep HEARTBEAT_INTERVAL seconds
                 time.sleep(self.HEARTBEAT_INTERVAL)
         # Start the heartbeat
         heartbeat = Thread(target=asyncio.run, args=(_heartbeat_loop(),))
@@ -96,13 +101,14 @@ class NanoNodeBot(commands.Bot):
 
     # This is called when the bot has logged on and set everything up
     async def on_ready(self):
+        # Set bot as initialized
+        self.initialized = True
         # Log successful connection
         Common.log(f"{self.user.name} connected")
         print(f"{self.user.name} connected")
         node_name = await self.get_value('nanoNodeName')
         status = f"Online"
         await self.set_online(True)
-
 
     # This is called when the bot sees an unknown command
     async def on_command_error(self, ctx, error):
