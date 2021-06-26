@@ -79,7 +79,14 @@ class NanoNodeBot(commands.Bot):
         answer = ""
         try:            
             # sending get request and saving the response as response object
-            r = requests.get(url = self.get_rpc_url(), params = param, timeout=self.timeout)
+           # r = requests.post(url = self.get_rpc_url(), data = param, timeout=self.timeout)
+            data = {"action":"version"}
+            r = requests.post("http://localhost:7076", json=data, timeout=self.timeout)
+            print("RPC URL: ", self.get_rpc_url())
+            print("Param: ", param)
+            print("Status code: ", r.status_code)
+            print("Answer: ", r.text)
+            # If success
             if r.status_code == 200:
                 # Parse JSON
                 answer = json.loads(r.text)
