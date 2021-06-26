@@ -20,6 +20,7 @@ class NanoNodeBot(commands.Bot):
     online = True
     discord_token = ""
     rpc_url = ""
+    api_url = ""
     client_id = ""
     cmd_prefix = ""
     permission = 0
@@ -30,6 +31,7 @@ class NanoNodeBot(commands.Bot):
         load_dotenv()
         self.discord_token= os.getenv('discord_token')
         self.rpc_url = os.getenv('rpc_url')
+        self.api_url = os.getenv('api_url')
         self.client_id = os.getenv('client_id')
         self.delegators_url = os.getenv('delegators_url')
         self.cmd_prefix = os.getenv('command_prefix', "!")
@@ -72,7 +74,27 @@ class NanoNodeBot(commands.Bot):
         # Log successful connection
         Common.log_error(f"{self.user.name} disconnected.")
 
+    # Send RPC request to rpc_url
+    async def send_rpc(self, param):
+        answer = ""
+        try:            
+            # sending get request and saving the response as response object
+            r = requests.get(url = self.get_rpc_url(), params = param, timeout=self.timeout)
+            if r.status_code == 200:
+                # Parse JSON
+                answer = json.loads(r.text)
+                # Log answer 
+                Common.logger.info(f"<- {answer}")
+            else:
+                # Update the status to
+                await self.set_online(False)
+                raise Exception("Could not connect to API")
+        except Exception as ex:
+            raise ex
+        return answer
+
     # Helper function for getting value from response
+    # From MyNanoNinja API endpoint
     async def get_value(self, param):
         answer = ""
         try:
@@ -149,6 +171,9 @@ class NanoNodeBot(commands.Bot):
             await self.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=status))
 
     def get_api_url(self):
+        return self.api_url
+
+    def get_rpc_url(self):
         return self.rpc_url
     
     def get_delegators_url(self):
