@@ -72,11 +72,11 @@ class AccountsCog(commands.Cog, name="Accounts"):
     @commands.command(name='delegators', aliases=['show_delegators'], help="Displays the delegators of the node")
     async def delegators(self,ctx):
         try:
-            value = await self.bot.get_delegators()
-            Common.logger.info(f" Representative {str(value)}")
-            response = str(value)
-
-            await ctx.send(response[:1500])
+            nano_account = await self.bot.get_nano_account()
+            print("Account: ", nano_account)
+            value = await self.bot.send_rpc({"action":"delegators","account":nano_account})
+            print("Delegates: ", value)
+            await ctx.send(value)
         except Exception as e:
             Common.logger.error("Exception occured processing request", exc_info=True)
             await ctx.send(ERROR_MESSAGE)   

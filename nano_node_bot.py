@@ -17,11 +17,15 @@ from common import Common
 
 class NanoNodeBot(commands.Bot):
 
+    # Online status indicator
     online = True
+    # The nano account associated with this node
+    nano_account = ""
     discord_token = ""
     rpc_url = ""
     api_url = ""
     client_id = ""
+    # The command prefix 
     cmd_prefix = ""
     permission = 0
     timeout = 0
@@ -77,10 +81,8 @@ class NanoNodeBot(commands.Bot):
     # Send RPC request to rpc_url
     async def send_rpc(self, param, value=""):
         try:            
-            # sending get request and saving the response as response object
-           # r = requests.post(url = self.get_rpc_url(), data = param, timeout=self.timeout)
-            data = {"action":"version"}
-            r = requests.post("http://localhost:7076", json=data, timeout=self.timeout)
+            # Send RPC POST request
+            r = requests.post(url = self.get_rpc_url(), json=param, timeout=self.timeout)
             # Debug info
             Common.logger.info(f"<- {r.text}")
             print("RPC URL: ", self.get_rpc_url())
@@ -160,6 +162,10 @@ class NanoNodeBot(commands.Bot):
     # Get online status of node
     async def get_online(self):
         return self.online
+
+    # Get nano account associated with node
+    async def get_nano_account(self):
+        return await self.get_value('nanoNodeAccount')
 
     # Set online status of node
     async def set_online(self, param):
