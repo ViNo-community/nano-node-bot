@@ -27,7 +27,7 @@ class BotCog(commands.Cog, name="Bot"):
         try:
             client_id = self.bot.get_client_id()
             permissions = self.bot.get_permission_int()
-            response = f"Open a browser and go to https://discord.com/oauth2/authorize?client_id={client_id}&permissions={permissions}&scope=bot"
+            response = f"Open a browser and go to https://discord.com/oauth2/authorize?client_id={client_id}&permissions=247872&scope=bot"
             await ctx.send(response)
         except Exception as e:
             Common.logger.error("Exception occured processing request", exc_info=True)
@@ -51,17 +51,6 @@ class BotCog(commands.Cog, name="Bot"):
             print("Set new logging level: ", new_logging_level)
             Common.logger.setLevel(new_logging_level)
             await ctx.send(f"Set logging level to {new_logging_level}")
-        except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
-
-    # THIS TEMPORARY COMMAND IS ONLY FOR DEBUGGING. WILL BE REMOVED
-    @commands.command(name='toggle_online', aliases=['toggle'], help="Toggle online status on/off [ONLY FOR DEBUG WILL BE REMOVED!!]")
-    async def toggle_online(self,ctx):
-        try:
-            # Toggle online status.
-            # Test method for now
-            await self.bot.set_online(not await self.bot.get_online())
         except Exception as e:
             Common.logger.error("Exception occured processing request", exc_info=True)
             await ctx.send(ERROR_MESSAGE)  
