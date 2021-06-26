@@ -33,12 +33,19 @@ class BotCog(commands.Cog, name="Bot"):
             Common.logger.error("Exception occured processing request", exc_info=True)
             await ctx.send(ERROR_MESSAGE)    
 
+    # Update the command prefix to something new
     @commands.command(name='set_prefix', help="Set bot prefix")
-    async def set_prefix(self,ctx,new_prefix):
+    async def set_prefix(self,ctx,new_prefix=""):
         try:
-            print("Set new command prefix: ",new_prefix)
+            # Check that new prefix is valid
+            if(new_prefix == ""):
+                await ctx.send(f"Usage: {self.bot.command_prefix}set_prefix <new_prefix>")
+                return
+            # Update command prefix
             self.bot.command_prefix = new_prefix
+            # Alert chat that command prefix has been updated
             await ctx.send(f"Set new command prefix to \"{new_prefix}\"")
+            # Update bot status message to show new prefix
             await self.bot.update_status()
         except Exception as e:
             Common.logger.error("Exception occured processing request", exc_info=True)
