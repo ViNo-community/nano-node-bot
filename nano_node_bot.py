@@ -62,11 +62,18 @@ class NanoNodeBot(commands.Bot):
         status = f"Online"
         await self.set_online(True)
 
-    # This is called when the bot sees an unknown command
+    # Bot encounters an error during command execution
     async def on_command_error(self, ctx, error):
-        Common.log_error(f"{ctx.message.author} tried unknown command {ctx.invoked_with} Error: {error}")
-        await ctx.send(f"I do not know what {ctx.invoked_with} means.")
-
+        if isinstance(error, commands.CommandNotFound):
+            Common.logger.error(f"{ctx.message.author} tried unknown command \"{ctx.invoked_with}\" Error: {error}", exc_info=True)
+            await ctx.send(f"I do not know what \"{ctx.invoked_with}\" means.")
+        elif isinstance(error, ConnectionError):
+            Common.logger.error(f"Connection Error: {error}", exc_info=True)
+            await ctx.send(f"Connection Error executing command \"{ctx.invoked_with}\". Please check logs")
+        else:
+            Common.logger.error(f"Error: {error}", exc_info=True)
+            await ctx.send(f"Error executing command \"{ctx.invoked_with}\". Please check logs.")
+ 
     # This is called when the bot has an error
     async def on_error(self, ctx, error):
         print("Bot encountered error: ", error)
@@ -132,7 +139,7 @@ class NanoNodeBot(commands.Bot):
 
     # Get nano account associated with node
     async def get_nano_account(self):
-        return self.get_value('nanoNodeAccount')
+        return await self.get_value('nanoNodeAccount')
 
     # Set online status of node
     async def set_online(self, param):
