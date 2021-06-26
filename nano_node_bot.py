@@ -74,11 +74,6 @@ class NanoNodeBot(commands.Bot):
             Common.logger.error(f"Error: {error}", exc_info=True)
             await ctx.send(f"Error executing command \"{ctx.invoked_with}\". Please check logs.")
  
-    # This is called when the bot has an error
-    async def on_error(self, ctx, error):
-        print("Bot encountered error: ", error)
-        Common.log_error("Error: {error}")
-
     # This is called when the bot disconnects
     async def on_disconnect(self):
         print("Bot disconnected")
