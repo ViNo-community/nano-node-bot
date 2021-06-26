@@ -85,10 +85,6 @@ class NanoNodeBot(commands.Bot):
             r = requests.post(url = self.get_rpc_url(), json=param, timeout=self.timeout)
             # Debug info
             Common.logger.info(f"<- {r.text}")
-            print("RPC URL: ", self.get_rpc_url())
-            print("Param: ", param)
-            print("Status code: ", r.status_code)
-            print("Answer: ", r.text)
             # If success
             if r.status_code == 200:
                 if(value==""):
@@ -130,42 +126,13 @@ class NanoNodeBot(commands.Bot):
             raise ex
         return answer
     
-    async def get_delegators(self):
-        answer = ""
-        try:
-            # Grab response from API_URL
-            r = requests.get(self.get_delegators_url(), timeout=self.timeout)
-            if r.status_code == 200:
-                # Parse JSON
-                content = json.loads(r.text)
-
-                for item in content:
-                    answer = content[item]
-  
-                for item in answer:
-                    answer[item] = (float(answer[item]) / 1000000000000000000000000000000.0)
-
-                # Log answer 
-                Common.logger.info(f"<- {answer}")
-                # Update to online
-                online = await self.get_online()
-                if(online== False):
-                    await self.set_online(True)
-            else:
-                # Update the status to
-                await self.set_online(False)
-                raise Exception("Could not connect to API")
-        except Exception as ex:
-            raise ex
-        return answer
-
     # Get online status of node
     async def get_online(self):
         return self.online
 
     # Get nano account associated with node
     async def get_nano_account(self):
-        return await self.get_value('nanoNodeAccount')
+        return self.get_value('nanoNodeAccount')
 
     # Set online status of node
     async def set_online(self, param):
@@ -190,9 +157,6 @@ class NanoNodeBot(commands.Bot):
 
     def get_rpc_url(self):
         return self.rpc_url
-    
-    def get_delegators_url(self):
-        return self.delegators_url
 
     def get_client_id(self):
         return self.client_id

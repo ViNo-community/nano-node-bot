@@ -86,11 +86,12 @@ class AccountsCog(commands.Cog, name="Accounts"):
                 msg = "No delegators"
             else:
                 for item in delegators:
-                    msg += "Account: " + item + " Balance: " + delegators[item] + "\n"
+                    msg += "**Account:** " + item + " **Balance:** " + delegators[item] + "\n"
             await ctx.send(msg)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)   
+            # Update the status to
+            await self.set_online(False)
+            raise Exception("Could not connect to API")
 
 # Plug-in function to add cog
 def setup(bot):
