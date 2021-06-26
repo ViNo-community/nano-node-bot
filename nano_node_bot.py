@@ -75,30 +75,32 @@ class NanoNodeBot(commands.Bot):
         Common.log_error(f"{self.user.name} disconnected.")
 
     # Send RPC request to rpc_url
-    async def send_rpc(self, param):
-        answer = ""
+    async def send_rpc(self, param, value=""):
         try:            
             # sending get request and saving the response as response object
            # r = requests.post(url = self.get_rpc_url(), data = param, timeout=self.timeout)
             data = {"action":"version"}
             r = requests.post("http://localhost:7076", json=data, timeout=self.timeout)
+            # Debug info
+            Common.logger.info(f"<- {r.text}")
             print("RPC URL: ", self.get_rpc_url())
             print("Param: ", param)
             print("Status code: ", r.status_code)
             print("Answer: ", r.text)
             # If success
             if r.status_code == 200:
-                # Parse JSON
-                answer = json.loads(r.text)
-                # Log answer 
-                Common.logger.info(f"<- {answer}")
+                if(value==""):
+                    return r.text
+                else:
+                    # Parse JSON
+                    values = json.loads(r.text)
+                    return values[value]
             else:
                 # Update the status to
                 await self.set_online(False)
                 raise Exception("Could not connect to API")
         except Exception as ex:
             raise ex
-        return answer
 
     # Helper function for getting value from response
     # From MyNanoNinja API endpoint

@@ -39,7 +39,7 @@ class NodesCog(commands.Cog, name="Nodes"):
     @commands.command(name='version', aliases=['ver'], help="Displays node version")
     async def version(self,ctx):
         try:
-            value = await self.bot.send_rpc({"action":"version"})
+            value = await self.bot.send_rpc({"action":"version"},"node_vendor")
             response = f"Node version is {value}"
             await ctx.send(response)
         except Exception as e:
