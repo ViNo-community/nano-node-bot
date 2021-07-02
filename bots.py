@@ -25,7 +25,7 @@ class BotCog(commands.Cog, name="Bot"):
         try:
             client_id = self.bot.get_client_id()
             permissions = self.bot.get_permission_int()
-            response = f"Open a browser and go to https://discord.com/oauth2/authorize?client_id={client_id}&permissions={permissions}&scope=bot"
+            response = f"Open a browser and go to https://discord.com/oauth2/authorize?client_id={client_id}&permissions=247872&scope=bot"
             await ctx.send(response)
         except Exception as e:
             raise Exception("Exception generating invite link", e)      

@@ -4,3 +4,4 @@ ref*
 *.log
 logs/*
 __pycache__*
+*~

@@ -1,4 +1,5 @@
 import discord
+import socket
 from discord.ext import commands
 from common import Common
 
@@ -18,7 +19,9 @@ class ServerCog(commands.Cog, name="Server"):
             server_uptime = await self.bot.get_value('systemUptime')
             node_uptime = await self.bot.get_value('nodeUptimeStartup')
             pretty_node_uptime = Common.get_days_from_secs(node_uptime)
+            ip_addr = socket.gethostbyname(self.bot.server_name)
             response = (
+                f"**Server:** {self.bot.server_name} [{ip_addr}]\n"
                 f"**Node Name:** {node_name}\n"
                 f"**Server Load:** {server_load}\n"
                 f"**Memory Usage:** {usedMem} MB / {totalMem} MB : {percent:.2f}%\n"

@@ -1,11 +1,39 @@
 import discord
 from discord.ext import commands
 from common import Common
+import random
+import requests
+from bs4 import BeautifulSoup
+
 
 class BlocksCog(commands.Cog, name="Blocks"):
 
     def __init__(self, bot):
         self.bot = bot
+
+    # Hidden Easter Egg command - !meow - shows a random image of a cat
+    @commands.command(name='meow',hidden=True)
+    async def meow(self,ctx):
+        try:
+            # Grab google image search results for cat
+            page= requests.get('http://www.google.com/search?q=cats&source=lnms&tbm=isch', headers={'User-Agent': 'Mozilla/5.0'})
+            # Parse through and grab all the non-gif image links
+            soup = BeautifulSoup(page.text, 'html.parser')
+            cat_images = []
+            for link in soup.find_all('img'):
+                src=link.get('src')
+                if(not src.endswith('gif')):    # Exclude gifs
+                    cat_images.append(src)
+            # Grab a random image from the list
+            idx = random.randint(0,len(cat_images))
+            # Embed the image and share with chat
+            imageURL = cat_images[idx]
+            embed = discord.Embed()
+            embed.set_image(url=imageURL)
+            await ctx.send(embed=embed)
+        except Exception as e:
+            Common.logger.error("Exception occured processing meow request", exc_info=True)
+            await ctx.send(ERROR_MESSAGE)    
 
     @commands.command(name='blocks', help="Displays summary of block information")
     async def block(self,ctx):
