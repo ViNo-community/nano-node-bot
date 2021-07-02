@@ -76,11 +76,21 @@ class AccountsCog(commands.Cog, name="Accounts"):
             # Parse delegators information - account number and balance
             delegators = content['delegators']
             msg = ""
+            CHUNK_SIZE = 1000
             if(content['delegators'] == ""):
                 msg = "No delegators"
             else:
+                print("delegators: ")
                 for item in delegators:
-                    msg += "**Account:** " + item + " **Balance:** " + delegators[item] + "\n"
+                    # Convert from raw to nano
+                    nano = Common.rawToNano(int(delegators[item]))
+                    # Cut message into chunks
+                    if(len(msg) > CHUNK_SIZE):
+                        await ctx.send(msg)
+                        msg = ""
+                    # Hide zero balances
+                    if(nano != 0): 
+                        msg += "**Account:** " + item + f" **Balance:** {nano:.4f}\n"
             await ctx.send(msg)
         except Exception as e:
             raise Exception("Could not grab delegators", e)
