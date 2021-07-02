@@ -2,7 +2,6 @@ import discord
 import socket
 from discord.ext import commands
 from common import Common
-from common import ERROR_MESSAGE
 
 class ServerCog(commands.Cog, name="Server"):
 
@@ -31,8 +30,7 @@ class ServerCog(commands.Cog, name="Server"):
             )
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)    
+            raise Exception("Exception displaying server summary", e)      
 
     @commands.command(name='server_uptime', aliases=['serveruptime','sup'], help="Displays server uptime")
     async def server_uptime(self,ctx):
@@ -41,8 +39,7 @@ class ServerCog(commands.Cog, name="Server"):
             response = f"Server uptime is {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)     
+            raise Exception("Could not grab server_uptime", e)      
 
     @commands.command(name='server_load', aliases=['serverload','systemload','load'], help="Displays server load")
     async def server_load(self,ctx):
@@ -51,8 +48,7 @@ class ServerCog(commands.Cog, name="Server"):
             response = f"Server load is {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)          
+            raise Exception("Could not grab server_load", e)           
 
     @commands.command(name='mem_usage', aliases=['memory_usage','memusage','memory','mem'], help="Displays memory usage")
     async def mem_usage(self,ctx):
@@ -63,8 +59,7 @@ class ServerCog(commands.Cog, name="Server"):
             response = f"Memory usage is {usedMem} MB / {totalMem} MB : {percent:.2f}%"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)     
+            raise Exception("Could not grab mem_usage", e)      
 
     @commands.command(name='hostname', aliases=['host'], help="Displays host name")
     async def node_name(self,ctx):
@@ -73,8 +68,7 @@ class ServerCog(commands.Cog, name="Server"):
             response = f"Node hostname is {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)     
+            raise Exception("Could not grab host name", e)      
 
 # Plug-in function to add cog
 def setup(bot):

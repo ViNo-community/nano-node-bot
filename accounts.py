@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from common import Common
-from common import ERROR_MESSAGE
+import json 
 
 class AccountsCog(commands.Cog, name="Accounts"):
 
@@ -25,8 +25,7 @@ class AccountsCog(commands.Cog, name="Accounts"):
             )
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)      
+            raise Exception("Error showing account summary", e)      
 
     @commands.command(name='balance', aliases=['bal','show_balance'], help="Displays account balance")
     async def balance(self,ctx):
@@ -35,8 +34,7 @@ class AccountsCog(commands.Cog, name="Accounts"):
             response = f"Account balance is {value:.2f} nano"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)      
+            raise Exception("Could not grab balance", e)   
 
     @commands.command(name='pending', aliases=['show_pending'], help="Displays account pending")
     async def pending(self,ctx):
@@ -45,8 +43,7 @@ class AccountsCog(commands.Cog, name="Accounts"):
             response = f"Account pending is {value:.2f} nano"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)     
+            raise Exception("Could not display account pending", e)     
 
     @commands.command(name='representative', aliases=['rep','show_rep','show_representative'], help="Displays representative")
     async def representative(self,ctx):
@@ -55,8 +52,7 @@ class AccountsCog(commands.Cog, name="Accounts"):
             response = f"Representative: {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)      
+            raise Exception("Could not grab representative", e)    
 
     @commands.command(name='voting_weight', aliases=['votingweight','weight','voting'], help="Displays voting weight")
     async def voting_weight(self,ctx):
@@ -65,8 +61,29 @@ class AccountsCog(commands.Cog, name="Accounts"):
             response = f"Voting weight is {value:.2f} nano"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)       
+            raise Exception("Could not grab voting weight", e)  
+    
+    @commands.command(name='delegators', aliases=['show_delegators'], help="Displays the delegators of the node")
+    async def delegators(self,ctx,ref_account=""):
+        try:
+            # If no account specified use account of node
+            if(ref_account == ""):
+                nano_account = await self.bot.get_nano_account()
+            else:
+                nano_account = ref_account
+            value = await self.bot.send_rpc({"action":"delegators","account":nano_account})
+            content = json.loads(value)
+            # Parse delegators information - account number and balance
+            delegators = content['delegators']
+            msg = ""
+            if(content['delegators'] == ""):
+                msg = "No delegators"
+            else:
+                for item in delegators:
+                    msg += "**Account:** " + item + " **Balance:** " + delegators[item] + "\n"
+            await ctx.send(msg)
+        except Exception as e:
+            raise Exception("Could not grab delegators", e)
 
 # Plug-in function to add cog
 def setup(bot):

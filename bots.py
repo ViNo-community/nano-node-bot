@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from common import Common
-from common import ERROR_MESSAGE
 
 class BotCog(commands.Cog, name="Bot"):
 
@@ -19,8 +18,7 @@ class BotCog(commands.Cog, name="Bot"):
             await ctx.invoke(self.bot.get_command('server'))
             await ctx.invoke(self.bot.get_command('blocks'))
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception("Exception showing info summary", e)   
 
     @commands.command(name='invite', help="Displays invite link")
     async def invite(self,ctx):
@@ -30,19 +28,24 @@ class BotCog(commands.Cog, name="Bot"):
             response = f"Open a browser and go to https://discord.com/oauth2/authorize?client_id={client_id}&permissions=247872&scope=bot"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)    
+            raise Exception("Exception generating invite link", e)      
 
+    # Update the command prefix to something new
     @commands.command(name='set_prefix', help="Set bot prefix")
-    async def set_prefix(self,ctx,new_prefix):
+    async def set_prefix(self,ctx,new_prefix=""):
         try:
-            print("Set new command prefix: ",new_prefix)
+            # Check that new prefix is valid
+            if(new_prefix == ""):
+                await ctx.send(f"Usage: {self.bot.command_prefix}set_prefix <new_prefix>")
+                return
+            # Update command prefix
             self.bot.command_prefix = new_prefix
+            # Alert chat that command prefix has been updated
             await ctx.send(f"Set new command prefix to \"{new_prefix}\"")
+            # Update bot status message to show new prefix
             await self.bot.update_status()
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception(f"Could not change command prefix to \"{new_prefix}\"", e)    
 
     @commands.command(name='set_logging', help="Set logging level")
     async def set_logging(self,ctx,new_level):
@@ -52,8 +55,7 @@ class BotCog(commands.Cog, name="Bot"):
             Common.logger.setLevel(new_logging_level)
             await ctx.send(f"Set logging level to {new_logging_level}")
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception(f"Could not change logging level to {new_logging_level}", e)    
 
 # Plug-in function to add cog
 def setup(bot):

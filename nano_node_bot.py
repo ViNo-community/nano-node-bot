@@ -24,11 +24,15 @@ class NanoNodeBot(commands.Bot):
     # Default values
     initialized = False
     online = True
+    # The nano account associated with this node
+    nano_account = ""
     discord_token = ""
     rpc_url = ""
     server_name = "patrola.me"
+    api_url = ""
     client_id = ""
     cmd_prefix = "!"
+    permission = 0
     timeout = 5.0
     # Check heartbeat every HEARTBEAT_INTERVAL seconds
     HEARTBEAT_INTERVAL = 20
@@ -46,6 +50,12 @@ class NanoNodeBot(commands.Bot):
         # Grab tokens
         self.discord_token= os.getenv('discord_token')
         self.rpc_url = os.getenv('rpc_url')
+        self.api_url = os.getenv('api_url')
+        self.client_id = os.getenv('client_id')
+        self.delegators_url = os.getenv('delegators_url')
+        self.cmd_prefix = os.getenv('command_prefix', "!")
+        self.permission = int(os.getenv('permission', 247872))
+        self.timeout = float(os.getenv('timeout', 5.0))
         # self.server_name = os.getenv('server')
         self.client_id = os.getenv('client_id')
         if os.getenv('command_prefix') is not None:
@@ -108,16 +118,18 @@ class NanoNodeBot(commands.Bot):
         print(f"{self.user.name} connected")
         await self.set_online(True)
 
-    # This is called when the bot sees an unknown command
+    # Bot encounters an error during command execution
     async def on_command_error(self, ctx, error):
-        print("Bot encountered command error")
-        Common.log_error(f"{ctx.message.author} tried unknown command {ctx.invoked_with} Error: {error}")
-        await ctx.send(f"I do not know what {ctx.invoked_with} means.")
-
-    # This is called when the bot has an error
-    async def on_error(self, ctx, error):
-        print("Bot encountered error: ", error)
-        Common.log_error("Error: {error}")
+        if isinstance(error, commands.CommandNotFound):
+            Common.logger.error(f"{ctx.message.author} tried unknown command \"{ctx.invoked_with}\" Error: {error}", exc_info=True)
+            await ctx.send(f"I do not know what \"{ctx.invoked_with}\" means.")
+        elif isinstance(error, ConnectionError):
+            Common.logger.error(f"Connection Error: {error}", exc_info=True)
+            await ctx.send(f"Connection Error executing command \"{ctx.invoked_with}\". Please check logs")
+        else:
+            Common.logger.error(f"Error: {error}", exc_info=True)
+            await ctx.send(f"Error executing command \"{ctx.invoked_with}\". Please check logs.")
+ 
 
     # This is called when the bot disconnects
     async def on_disconnect(self):
@@ -125,7 +137,30 @@ class NanoNodeBot(commands.Bot):
         # Log successful connection
         Common.log_error(f"{self.user.name} disconnected.")
 
+    # Send RPC request to rpc_url
+    async def send_rpc(self, param, value=""):
+        try:            
+            # Send RPC POST request
+            r = requests.post(url = self.get_rpc_url(), json=param, timeout=self.timeout)
+            # Debug info
+            Common.logger.info(f"<- {r.text}")
+            # If success
+            if r.status_code == 200:
+                if(value==""):
+                    return r.text
+                else:
+                    # Parse JSON
+                    values = json.loads(r.text)
+                    return values[value]
+            else:
+                # Update the status to
+                await self.set_online(False)
+                raise Exception("Could not connect to API")
+        except Exception as ex:
+            raise ex
+
     # Helper function for getting value from response
+    # From MyNanoNinja API endpoint
     async def get_value(self, param):
         answer = ""
         try:
@@ -155,6 +190,10 @@ class NanoNodeBot(commands.Bot):
     async def get_online(self):
         return self.online
 
+    # Get nano account associated with node
+    async def get_nano_account(self):
+        return await self.get_value('nanoNodeAccount')
+
     # Set online status of node
     async def set_online(self, param):
         try:
@@ -171,6 +210,9 @@ class NanoNodeBot(commands.Bot):
             await self.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=status))
 
     def get_api_url(self):
+        return self.api_url
+
+    def get_rpc_url(self):
         return self.rpc_url
 
     def get_client_id(self):

@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
 from common import Common
-from common import ERROR_MESSAGE
 import random
 import requests
 from bs4 import BeautifulSoup
+
 
 class BlocksCog(commands.Cog, name="Blocks"):
 
@@ -50,8 +50,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             )
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)      
+            raise Exception("Could not grab blocks", e)       
 
     @commands.command(name='current_block', aliases=['currentblock','cur','current'], help="Displays the current block")
     async def current_block(self,ctx):
@@ -60,8 +59,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             response = f"Current block is {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)     
+            raise Exception("Could not grab current_block", e)     
 
     @commands.command(name='cemented_blocks', aliases=['cementedblocks','cemented','cem'], help="Displays the cemented block count")
     async def cemented_blocks(self,ctx):
@@ -70,8 +68,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             response = f"Cemented block count is {value}"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception("Could not grab cemented_blocks", e)  
 
     @commands.command(name='unchecked_blocks', aliases=['uncheckedblocks','unchecked'], help="Displays the number of unchecked blocks")
     async def unchecked_blocks(self,ctx):
@@ -80,8 +77,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             response = f"{value} unchecked blocks"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception("Could not grab unchecked blocks", e)   
 
     @commands.command(name='sync', aliases=['blocksync','block_sync','bsync'], help="Displays block sync")
     async def block_sync(self,ctx):
@@ -90,8 +86,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             response = f"Block sync is {value}%"
             await ctx.send(response)
         except Exception as e:
-            Common.logger.error("Exception occured processing request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)  
+            raise Exception("Could not grab sync", e)  
 
 # Plug-in function to add cog
 def setup(bot):
