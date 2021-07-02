@@ -35,7 +35,7 @@ class NanoNodeBot(commands.Bot):
     permission = 0
     timeout = 5.0
     # Check heartbeat every HEARTBEAT_INTERVAL seconds
-    HEARTBEAT_INTERVAL = 20
+    HEARTBEAT_INTERVAL = 4000
 
     def __init__(self):
         # Load discord token from .env file
@@ -141,6 +141,7 @@ class NanoNodeBot(commands.Bot):
     async def send_rpc(self, param, value=""):
         try:            
             # Send RPC POST request
+            Common.logger.info(f"-> {param}");
             r = requests.post(url = self.get_rpc_url(), json=param, timeout=self.timeout)
             # Debug info
             Common.logger.info(f"<- {r.text}")
