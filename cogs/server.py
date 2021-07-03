@@ -1,4 +1,3 @@
-import discord
 import socket
 from discord.ext import commands
 from common import Common

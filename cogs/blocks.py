@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from common import Common
 import random
 import requests
 from bs4 import BeautifulSoup
@@ -32,8 +31,7 @@ class BlocksCog(commands.Cog, name="Blocks"):
             embed.set_image(url=imageURL)
             await ctx.send(embed=embed)
         except Exception as e:
-            Common.logger.error("Exception occured processing meow request", exc_info=True)
-            await ctx.send(ERROR_MESSAGE)    
+            raise Exception("Could not process meow request", e)  
 
     @commands.command(name='blocks', help="Displays summary of block information")
     async def block(self,ctx):

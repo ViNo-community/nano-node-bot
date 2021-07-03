@@ -3,7 +3,6 @@
 # Nano Discord bot
 import asyncio
 from asyncio.tasks import sleep
-from pathlib import Path
 from discord.ext import commands
 import discord
 import os
