@@ -10,11 +10,6 @@ import os
 from dotenv import load_dotenv
 import requests
 import json
-from blocks import BlocksCog
-from accounts import AccountsCog
-from nodes import NodesCog
-from server import ServerCog
-from bots import BotCog
 from common import Common
 from threading import Thread
 import time
@@ -89,12 +84,16 @@ class NanoNodeBot(commands.Bot):
         heartbeat = Thread(target=asyncio.run, args=(_heartbeat_loop(),))
         heartbeat.daemon = True
         heartbeat.start()
-        # Add plug-ins
-        self.add_cog(BlocksCog(self))
-        self.add_cog(AccountsCog(self))
-        self.add_cog(NodesCog(self))
-        self.add_cog(ServerCog(self))
-        self.add_cog(BotCog(self))
+        # Automatically load cogs
+        for file in os.listdir('./cogs'):
+            if file.endswith(".py"):
+                try:
+                    self.load_extension(f"cogs.{file[:-3]}")
+                    Common.log(f"Loaded Cog: {file}")
+                    print(f"Loaded: {file}")
+                except Exception as e:
+                    Common.log_error(f"Could not load Cog: {file}: {e}")
+                    print(f"Could not load: {file}:", e)
 
     def run(self):
         # Run bot
