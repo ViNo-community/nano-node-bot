@@ -62,6 +62,24 @@ class AccountsCog(commands.Cog, name="Accounts"):
             await ctx.send(response)
         except Exception as e:
             raise Exception("Could not grab voting weight", e)  
+
+
+    @commands.command(name='delegators_count', help="Displays the amount of delegators of the node")
+    async def delegators_count(self,ctx,ref_account=""):
+        try:
+            # If no account specified use account of node
+            if(ref_account == ""):
+                nano_account = await self.bot.get_nano_account()
+            else:
+                nano_account = ref_account
+            value = await self.bot.send_rpc({"action":"delegators_count","account":nano_account})
+            content = json.loads(value)
+            # Parse delegators information - account number and balance
+            delegators_count = content['count']
+            response = f"{nano_account} has {delegators_count} delegators"
+            await ctx.send(response)
+        except Exception as e:
+            raise Exception("Could not grab delegators_count", e)
     
     @commands.command(name='delegators', aliases=['show_delegators'], help="Displays the delegators of the node")
     async def delegators(self,ctx,ref_account=""):
@@ -80,7 +98,6 @@ class AccountsCog(commands.Cog, name="Accounts"):
             if(content['delegators'] == ""):
                 msg = "No delegators"
             else:
-                print("delegators: ")
                 for item in delegators:
                     # Convert from raw to nano
                     nano = Common.rawToNano(int(delegators[item]))
