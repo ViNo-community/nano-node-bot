@@ -35,7 +35,7 @@ class NanoNodeBot(commands.Bot):
     permission = 0
     timeout = 5.0
     # Check heartbeat every HEARTBEAT_INTERVAL seconds
-    HEARTBEAT_INTERVAL = 4000
+    heartbeat_interval = 0
 
     def __init__(self):
         # Load discord token from .env file
@@ -55,6 +55,7 @@ class NanoNodeBot(commands.Bot):
         self.delegators_url = os.getenv('delegators_url')
         self.cmd_prefix = os.getenv('command_prefix', "!")
         self.permission = int(os.getenv('permission', 247872))
+        self.heartbeat_interval = int(os.getenv('heartbeat_interval', 180))
         self.timeout = float(os.getenv('timeout', 5.0))
         # self.server_name = os.getenv('server')
         self.client_id = os.getenv('client_id')
@@ -77,13 +78,13 @@ class NanoNodeBot(commands.Bot):
                 except Exception as error:
                     online = False
                     # Error. Output to chat?
-                    Common.log_error("Error checking online status of node: {error}")
+                    Common.log_error(f"Error checking online status of node: {error}")
                     print(error)
                 print(f"CHECKING IF ONLINE: {online} INIT: {self.initialized}")
                 if(self.initialized):
                     await self.set_online(online)
                 # Sleep HEARTBEAT_INTERVAL seconds
-                time.sleep(self.HEARTBEAT_INTERVAL)
+                time.sleep(self.heartbeat_interval)
         # Start the heartbeat
         heartbeat = Thread(target=asyncio.run, args=(_heartbeat_loop(),))
         heartbeat.daemon = True
