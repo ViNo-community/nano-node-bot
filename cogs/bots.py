@@ -1,4 +1,5 @@
 from discord.ext import commands
+import dotenv
 from common import Common
 
 class BotCog(commands.Cog, name="Bot"):
@@ -39,6 +40,8 @@ class BotCog(commands.Cog, name="Bot"):
                 return
             # Update command prefix
             self.bot.command_prefix = new_prefix
+            # Save in .env file
+            dotenv.set_key(".env","command_prefix", new_prefix)
             # Alert chat that command prefix has been updated
             await ctx.send(f"Set new command prefix to \"{new_prefix}\"")
             # Update bot status message to show new prefix
@@ -50,8 +53,10 @@ class BotCog(commands.Cog, name="Bot"):
     async def set_logging(self,ctx,new_level):
         try:
             new_logging_level = int(new_level)
-            print("Set new logging level: ", new_logging_level)
+            # Update logging level
             Common.logger.setLevel(new_logging_level)
+            # Save in .env file
+            dotenv.set_key(".env","logging_level", new_level)
             await ctx.send(f"Set logging level to {new_logging_level}")
         except Exception as e:
             raise Exception(f"Could not change logging level to {new_logging_level}", e)    
