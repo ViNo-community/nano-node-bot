@@ -123,6 +123,9 @@ class NanoNodeBot(commands.Bot):
         elif isinstance(error, ConnectionError):
             Common.logger.error(f"Connection Error: {error}", exc_info=True)
             await ctx.send(f"Connection Error executing command \"{ctx.invoked_with}\". Please check logs")
+        elif isinstance(error, commands.CheckFailure):
+            Common.logger.error(f"Check Failure Error: {error} {error.args}", exc_info=True)
+            await ctx.reply(f"Sorry, you do not have permission to execute \"{ctx.invoked_with}\".")    
         else:
             Common.logger.error(f"Error: {error}", exc_info=True)
             await ctx.send(f"Error executing command \"{ctx.invoked_with}\". Please check logs.")
