@@ -21,6 +21,7 @@ class BotCog(commands.Cog, name="Bot"):
             raise Exception("Exception showing info summary", e)   
 
     @commands.command(name='invite', help="Displays invite link")
+    @commands.has_any_role('Core','Dev')
     async def invite(self,ctx):
         try:
             client_id = self.bot.get_client_id()
@@ -32,6 +33,7 @@ class BotCog(commands.Cog, name="Bot"):
 
     # Update the command prefix to something new
     @commands.command(name='set_prefix', help="Set bot prefix")
+    @commands.has_any_role('Core','Dev')
     async def set_prefix(self,ctx,new_prefix=""):
         try:
             # Check that new prefix is valid
@@ -50,6 +52,7 @@ class BotCog(commands.Cog, name="Bot"):
             raise Exception(f"Could not change command prefix to \"{new_prefix}\"", e)    
 
     @commands.command(name='set_logging', help="Set logging level")
+    @commands.has_any_role('Core','Dev')
     async def set_logging(self,ctx,new_level):
         try:
             new_logging_level = int(new_level)
